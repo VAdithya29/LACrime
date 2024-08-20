@@ -1,0 +1,1144 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.4.554">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Adithya Venghatesan">
+
+<title>Crime EDA</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="Crime EDA_files/libs/clipboard/clipboard.min.js"></script>
+<script src="Crime EDA_files/libs/quarto-html/quarto.js"></script>
+<script src="Crime EDA_files/libs/quarto-html/popper.min.js"></script>
+<script src="Crime EDA_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="Crime EDA_files/libs/quarto-html/anchor.min.js"></script>
+<link href="Crime EDA_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="Crime EDA_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="Crime EDA_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="Crime EDA_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="Crime EDA_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script src="Crime EDA_files/libs/htmlwidgets-1.6.4/htmlwidgets.js"></script>
+
+<script src="Crime EDA_files/libs/plotly-binding-4.10.4/plotly.js"></script>
+
+<script src="Crime EDA_files/libs/typedarray-0.1/typedarray.min.js"></script>
+
+<script src="Crime EDA_files/libs/jquery-3.5.1/jquery.min.js"></script>
+
+<link href="Crime EDA_files/libs/crosstalk-1.2.1/css/crosstalk.min.css" rel="stylesheet">
+
+<script src="Crime EDA_files/libs/crosstalk-1.2.1/js/crosstalk.min.js"></script>
+
+<link href="Crime EDA_files/libs/plotly-htmlwidgets-css-2.11.1/plotly-htmlwidgets.css" rel="stylesheet">
+
+<script src="Crime EDA_files/libs/plotly-main-2.11.1/plotly-latest.min.js"></script>
+
+
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Crime EDA</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Adithya Venghatesan </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>Dataset: https://www.kaggle.com/datasets/asaniczka/crimes-in-los-angeles-2020-2023</p>
+<section id="load-required-libraries" class="level2">
+<h2 class="anchored" data-anchor-id="load-required-libraries">Load required Libraries</h2>
+<div class="cell" data-warnings="false">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'dplyr' was built under R version 4.3.2</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Attaching package: 'dplyr'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following objects are masked from 'package:stats':
+
+    filter, lag</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following objects are masked from 'package:base':
+
+    intersect, setdiff, setequal, union</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lubridate)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Attaching package: 'lubridate'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following objects are masked from 'package:base':
+
+    date, intersect, setdiff, union</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(caret)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'caret' was built under R version 4.3.3</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loading required package: lattice</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(leaflet)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'leaflet' was built under R version 4.3.2</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(plotly)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'plotly' was built under R version 4.3.3</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Attaching package: 'plotly'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following object is masked from 'package:ggplot2':
+
+    last_plot</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following object is masked from 'package:stats':
+
+    filter</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following object is masked from 'package:graphics':
+
+    layout</code></pre>
+</div>
+</div>
+</section>
+<section id="load-the-dataset" class="level2">
+<h2 class="anchored" data-anchor-id="load-the-dataset">Load the dataset</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>crimeDatacsv <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"LA Crime Data.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(crimeDatacsv)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     DR_NO            Date.Rptd           DATE.OCC            TIME.OCC   
+ Min.   :      817   Length:944235      Length:944235      Min.   :   1  
+ 1st Qu.:210508145   Class :character   Class :character   1st Qu.: 900  
+ Median :220620262   Mode  :character   Mode  :character   Median :1419  
+ Mean   :218877718                                         Mean   :1338  
+ 3rd Qu.:230706134                                         3rd Qu.:1900  
+ Max.   :249913791                                         Max.   :2359  
+                                                                         
+      AREA        AREA.NAME          Rpt.Dist.No      Part.1.2   
+ Min.   : 1.00   Length:944235      Min.   : 101   Min.   :1.00  
+ 1st Qu.: 6.00   Class :character   1st Qu.: 622   1st Qu.:1.00  
+ Median :11.00   Mode  :character   Median :1142   Median :1.00  
+ Mean   :10.72                      Mean   :1119   Mean   :1.41  
+ 3rd Qu.:16.00                      3rd Qu.:1619   3rd Qu.:2.00  
+ Max.   :21.00                      Max.   :2199   Max.   :2.00  
+                                                                 
+     Crm.Cd      Crm.Cd.Desc          Mocodes             Vict.Age    
+ Min.   :110.0   Length:944235      Length:944235      Min.   : -4.0  
+ 1st Qu.:331.0   Class :character   Class :character   1st Qu.:  0.0  
+ Median :442.0   Mode  :character   Mode  :character   Median : 30.0  
+ Mean   :500.8                                         Mean   : 29.5  
+ 3rd Qu.:626.0                                         3rd Qu.: 45.0  
+ Max.   :956.0                                         Max.   :120.0  
+                                                                      
+   Vict.Sex         Vict.Descent         Premis.Cd     Premis.Desc       
+ Length:944235      Length:944235      Min.   :101.0   Length:944235     
+ Class :character   Class :character   1st Qu.:101.0   Class :character  
+ Mode  :character   Mode  :character   Median :203.0   Mode  :character  
+                                       Mean   :306.6                     
+                                       3rd Qu.:501.0                     
+                                       Max.   :976.0                     
+                                       NA's   :10                        
+ Weapon.Used.Cd   Weapon.Desc           Status          Status.Desc       
+ Min.   :101.0    Length:944235      Length:944235      Length:944235     
+ 1st Qu.:311.0    Class :character   Class :character   Class :character  
+ Median :400.0    Mode  :character   Mode  :character   Mode  :character  
+ Mean   :363.7                                                            
+ 3rd Qu.:400.0                                                            
+ Max.   :516.0                                                            
+ NA's   :619758                                                           
+    Crm.Cd.1        Crm.Cd.2         Crm.Cd.3         Crm.Cd.4     
+ Min.   :110.0   Min.   :210.0    Min.   :310      Min.   :821.0   
+ 1st Qu.:331.0   1st Qu.:998.0    1st Qu.:998      1st Qu.:998.0   
+ Median :442.0   Median :998.0    Median :998      Median :998.0   
+ Mean   :500.6   Mean   :958.1    Mean   :984      Mean   :991.2   
+ 3rd Qu.:626.0   3rd Qu.:998.0    3rd Qu.:998      3rd Qu.:998.0   
+ Max.   :956.0   Max.   :999.0    Max.   :999      Max.   :999.0   
+ NA's   :11      NA's   :875977   NA's   :941954   NA's   :944171  
+   LOCATION         Cross.Street            LAT             LON        
+ Length:944235      Length:944235      Min.   : 0.00   Min.   :-118.7  
+ Class :character   Class :character   1st Qu.:34.01   1st Qu.:-118.4  
+ Mode  :character   Mode  :character   Median :34.06   Median :-118.3  
+                                       Mean   :33.99   Mean   :-118.1  
+                                       3rd Qu.:34.16   3rd Qu.:-118.3  
+                                       Max.   :34.33   Max.   :   0.0  
+                                                                       </code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">unique</span>(crimeDatacsv<span class="sc">$</span>Crm.Cd.Desc)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  [1] "VEHICLE - STOLEN"                                        
+  [2] "BURGLARY FROM VEHICLE"                                   
+  [3] "BIKE - STOLEN"                                           
+  [4] "SHOPLIFTING-GRAND THEFT ($950.01 &amp; OVER)"                
+  [5] "THEFT OF IDENTITY"                                       
+  [6] "BATTERY - SIMPLE ASSAULT"                                
+  [7] "SODOMY/SEXUAL CONTACT B/W PENIS OF ONE PERS TO ANUS OTH" 
+  [8] "CRM AGNST CHLD (13 OR UNDER) (14-15 &amp; SUSP 10 YRS OLDER)"
+  [9] "SEX,UNLAWFUL(INC MUTUAL CONSENT, PENETRATION W/ FRGN OBJ"
+ [10] "ASSAULT WITH DEADLY WEAPON, AGGRAVATED ASSAULT"          
+ [11] "LETTERS, LEWD  -  TELEPHONE CALLS, LEWD"                 
+ [12] "THEFT-GRAND ($950.01 &amp; OVER)EXCPT,GUNS,FOWL,LIVESTK,PROD"
+ [13] "CRIMINAL THREATS - NO WEAPON DISPLAYED"                  
+ [14] "EMBEZZLEMENT, GRAND THEFT ($950.01 &amp; OVER)"              
+ [15] "THEFT FROM MOTOR VEHICLE - PETTY ($950 &amp; UNDER)"         
+ [16] "CHILD ANNOYING (17YRS &amp; UNDER)"                          
+ [17] "BURGLARY"                                                
+ [18] "CONTEMPT OF COURT"                                       
+ [19] "THEFT PLAIN - PETTY ($950 &amp; UNDER)"                      
+ [20] "INTIMATE PARTNER - SIMPLE ASSAULT"                       
+ [21] "LEWD CONDUCT"                                            
+ [22] "THEFT PLAIN - ATTEMPT"                                   
+ [23] "THEFT FROM MOTOR VEHICLE - GRAND ($950.01 AND OVER)"     
+ [24] "ROBBERY"                                                 
+ [25] "BUNCO, GRAND THEFT"                                      
+ [26] "BATTERY WITH SEXUAL CONTACT"                             
+ [27] "INTIMATE PARTNER - AGGRAVATED ASSAULT"                   
+ [28] "ORAL COPULATION"                                         
+ [29] "UNAUTHORIZED COMPUTER ACCESS"                            
+ [30] "VIOLATION OF RESTRAINING ORDER"                          
+ [31] "SHOPLIFTING - PETTY THEFT ($950 &amp; UNDER)"                
+ [32] "VANDALISM - FELONY ($400 &amp; OVER, ALL CHURCH VANDALISMS)" 
+ [33] "OTHER MISCELLANEOUS CRIME"                               
+ [34] "BRANDISH WEAPON"                                         
+ [35] "DOCUMENT FORGERY / STOLEN FELONY"                        
+ [36] "SEX OFFENDER REGISTRANT OUT OF COMPLIANCE"               
+ [37] "RAPE, FORCIBLE"                                          
+ [38] "VANDALISM - MISDEAMEANOR ($399 OR UNDER)"                
+ [39] "CHILD ABUSE (PHYSICAL) - SIMPLE ASSAULT"                 
+ [40] "CREDIT CARDS, FRAUD USE ($950.01 &amp; OVER)"                
+ [41] "THREATENING PHONE CALLS/LETTERS"                         
+ [42] "SEXUAL PENETRATION W/FOREIGN OBJECT"                     
+ [43] "EXTORTION"                                               
+ [44] "OTHER ASSAULT"                                           
+ [45] "PICKPOCKET"                                              
+ [46] "ARSON"                                                   
+ [47] "DISTURBING THE PEACE"                                    
+ [48] "BUNCO, ATTEMPT"                                          
+ [49] "HUMAN TRAFFICKING - INVOLUNTARY SERVITUDE"               
+ [50] "PEEPING TOM"                                             
+ [51] "VIOLATION OF COURT ORDER"                                
+ [52] "FALSE POLICE REPORT"                                     
+ [53] "CONTRIBUTING"                                            
+ [54] "FALSE IMPRISONMENT"                                      
+ [55] "CHILD ABUSE (PHYSICAL) - AGGRAVATED ASSAULT"             
+ [56] "ATTEMPTED ROBBERY"                                       
+ [57] "CREDIT CARDS, FRAUD USE ($950 &amp; UNDER"                   
+ [58] "CHILD STEALING"                                          
+ [59] "LEWD/LASCIVIOUS ACTS WITH CHILD"                         
+ [60] "EMBEZZLEMENT, PETTY THEFT ($950 &amp; UNDER)"                
+ [61] "INDECENT EXPOSURE"                                       
+ [62] "CHILD NEGLECT (SEE 300 W.I.C.)"                          
+ [63] "STALKING"                                                
+ [64] "DISHONEST EMPLOYEE - GRAND THEFT"                        
+ [65] "TRESPASSING"                                             
+ [66] "BURGLARY, ATTEMPTED"                                     
+ [67] "RAPE, ATTEMPTED"                                         
+ [68] "DISCHARGE FIREARMS/SHOTS FIRED"                          
+ [69] "PIMPING"                                                 
+ [70] "HUMAN TRAFFICKING - COMMERCIAL SEX ACTS"                 
+ [71] "VEHICLE - ATTEMPT STOLEN"                                
+ [72] "PANDERING"                                               
+ [73] "FIREARMS RESTRAINING ORDER (FIREARMS RO)"                
+ [74] "RESISTING ARREST"                                        
+ [75] "BURGLARY FROM VEHICLE, ATTEMPTED"                        
+ [76] "THEFT, PERSON"                                           
+ [77] "BATTERY POLICE (SIMPLE)"                                 
+ [78] "VEHICLE, STOLEN - OTHER (MOTORIZED SCOOTERS, BIKES, ETC)"
+ [79] "THEFT FROM PERSON - ATTEMPT"                             
+ [80] "FAILURE TO YIELD"                                        
+ [81] "BOMB SCARE"                                              
+ [82] "ASSAULT WITH DEADLY WEAPON ON POLICE OFFICER"            
+ [83] "BUNCO, PETTY THEFT"                                      
+ [84] "SHOTS FIRED AT INHABITED DWELLING"                       
+ [85] "DEFRAUDING INNKEEPER/THEFT OF SERVICES, $950 &amp; UNDER"    
+ [86] "KIDNAPPING - GRAND ATTEMPT"                              
+ [87] "SHOTS FIRED AT MOVING VEHICLE, TRAIN OR AIRCRAFT"        
+ [88] "TILL TAP - GRAND THEFT ($950.01 &amp; OVER)"                 
+ [89] "VIOLATION OF TEMPORARY RESTRAINING ORDER"                
+ [90] "THROWING OBJECT AT MOVING VEHICLE"                       
+ [91] "DOCUMENT WORTHLESS ($200.01 &amp; OVER)"                     
+ [92] "KIDNAPPING"                                              
+ [93] "CRIMINAL HOMICIDE"                                       
+ [94] "PURSE SNATCHING"                                         
+ [95] "THEFT FROM MOTOR VEHICLE - ATTEMPT"                      
+ [96] "DISHONEST EMPLOYEE - PETTY THEFT"                        
+ [97] "CHILD PORNOGRAPHY"                                       
+ [98] "WEAPONS POSSESSION/BOMBING"                              
+ [99] "DRIVING WITHOUT OWNER CONSENT (DWOC)"                    
+[100] "REPLICA FIREARMS(SALE,DISPLAY,MANUFACTURE OR DISTRIBUTE)"
+[101] "LYNCHING"                                                
+[102] "RECKLESS DRIVING"                                        
+[103] "SHOPLIFTING - ATTEMPT"                                   
+[104] "COUNTERFEIT"                                             
+[105] "DEFRAUDING INNKEEPER/THEFT OF SERVICES, OVER $950.01"    
+[106] "BATTERY ON A FIREFIGHTER"                                
+[107] "CRUELTY TO ANIMALS"                                      
+[108] "BOAT - STOLEN"                                           
+[109] "ILLEGAL DUMPING"                                         
+[110] "PROWLER"                                                 
+[111] "DRUGS, TO A MINOR"                                       
+[112] "THEFT, COIN MACHINE - PETTY ($950 &amp; UNDER)"              
+[113] "DOCUMENT WORTHLESS ($200 &amp; UNDER)"                       
+[114] "MANSLAUGHTER, NEGLIGENT"                                 
+[115] "PETTY THEFT - AUTO REPAIR"                               
+[116] "THEFT, COIN MACHINE - ATTEMPT"                           
+[117] "TILL TAP - PETTY ($950 &amp; UNDER)"                         
+[118] "PURSE SNATCHING - ATTEMPT"                               
+[119] "LYNCHING - ATTEMPTED"                                    
+[120] "BIKE - ATTEMPTED STOLEN"                                 
+[121] "GRAND THEFT / AUTO REPAIR"                               
+[122] "CONSPIRACY"                                              
+[123] "BRIBERY"                                                 
+[124] "GRAND THEFT / INSURANCE FRAUD"                           
+[125] "DRUNK ROLL"                                              
+[126] "CHILD ABANDONMENT"                                       
+[127] "THEFT, COIN MACHINE - GRAND ($950.01 &amp; OVER)"            
+[128] "DISRUPT SCHOOL"                                          
+[129] "PICKPOCKET, ATTEMPT"                                     
+[130] "TELEPHONE PROPERTY - DAMAGE"                             
+[131] "BEASTIALITY, CRIME AGAINST NATURE SEXUAL ASSLT WITH ANIM"
+[132] "BIGAMY"                                                  
+[133] "FAILURE TO DISPERSE"                                     
+[134] "FIREARMS EMERGENCY PROTECTIVE ORDER (FIREARMS EPO)"      
+[135] "INCEST (SEXUAL ACTS BETWEEN BLOOD RELATIVES)"            
+[136] "BLOCKING DOOR INDUCTION CENTER"                          
+[137] "INCITING A RIOT"                                         
+[138] "DISHONEST EMPLOYEE ATTEMPTED THEFT"                      
+[139] "TRAIN WRECKING"                                          </code></pre>
+</div>
+</div>
+<p>There have been 139 unique types of crime in Los Angeles.</p>
+<p>Lets look at the distribution of the top 10 types of crimes.</p>
+<p>Dropping columns that are not required for EDA is the first order of business. The columns that will be dropped are: DR_NO, Date.Rptd, Rpt.Dist.No, Part.1.2, Mocodes, Status, Status.Desc, Crm.Cd.1, Crm.Cd.2, Crm.Cd.3, Crm.Cd.4, LOCATION, Cross.Street, Weapon.Desc, Weapon.Used.Cd. We will make the necessary changes and store them in a new dataframe called crimeDataCleaned.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Store the columns to be removed in a variable</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>colsToRemove <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"DR_NO"</span>, <span class="st">"Date.Rptd"</span>, <span class="st">"Rpt.Dist.No"</span>, </span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>                  <span class="st">"Part.1.2"</span>, <span class="st">"Mocodes"</span>, <span class="st">"Status"</span>, </span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>                  <span class="st">"Status.Desc"</span>, <span class="st">"Crm.Cd.1"</span>, <span class="st">"Crm.Cd.2"</span>, </span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>                  <span class="st">"Crm.Cd.3"</span>, <span class="st">"Crm.Cd.4"</span>, <span class="st">"LOCATION"</span>,<span class="st">"Premis.Cd"</span>,<span class="st">"Premis.Desc"</span>, </span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>                  <span class="st">"Cross.Street"</span>,<span class="st">"Weapon.Desc"</span>,<span class="st">"Weapon.Used.Cd"</span>)</span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Drop the specified columns and store the result in a new dataframe</span></span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>crimeDataCleaned <span class="ot">&lt;-</span> crimeDatacsv[, <span class="sc">!</span><span class="fu">names</span>(crimeDatacsv) <span class="sc">%in%</span> colsToRemove]</span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Display the structure of the cleaned data to verify</span></span>
+<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(crimeDataCleaned)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>'data.frame':   944235 obs. of  11 variables:
+ $ DATE.OCC    : chr  "03/01/2020 12:00:00 AM" "02/08/2020 12:00:00 AM" "11/04/2020 12:00:00 AM" "03/10/2020 12:00:00 AM" ...
+ $ TIME.OCC    : int  2130 1800 1700 2037 1200 2300 900 1110 1400 1220 ...
+ $ AREA        : int  7 1 3 9 6 18 1 3 13 19 ...
+ $ AREA.NAME   : chr  "Wilshire" "Central" "Southwest" "Van Nuys" ...
+ $ Crm.Cd      : int  510 330 480 343 354 354 354 354 354 624 ...
+ $ Crm.Cd.Desc : chr  "VEHICLE - STOLEN" "BURGLARY FROM VEHICLE" "BIKE - STOLEN" "SHOPLIFTING-GRAND THEFT ($950.01 &amp; OVER)" ...
+ $ Vict.Age    : int  0 47 19 19 28 41 25 27 24 26 ...
+ $ Vict.Sex    : chr  "M" "M" "X" "M" ...
+ $ Vict.Descent: chr  "O" "O" "X" "O" ...
+ $ LAT         : num  34 34 34 34.2 34.1 ...
+ $ LON         : num  -118 -118 -118 -118 -118 ...</code></pre>
+</div>
+</div>
+<p>DATE.OCC is in dd/mm/yyyy hh:mm:ss AM/PM format. All the times are 12:00:00 since there is a separate TIME.OCC Column. We can get rid of the Time in this column and use lubritdate to extract the month and year and store them in separate columns.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert DATE.OCC to a proper datetime format using lubridate</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>crimeDataCleaned<span class="sc">$</span>DATE.OCC <span class="ot">&lt;-</span> <span class="fu">mdy_hms</span>(crimeDataCleaned<span class="sc">$</span>DATE.OCC)</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract the month and year from DATE.OCC and store them in new columns</span></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>crimeDataCleaned<span class="sc">$</span>Month <span class="ot">&lt;-</span> <span class="fu">month</span>(crimeDataCleaned<span class="sc">$</span>DATE.OCC)</span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>crimeDataCleaned<span class="sc">$</span>Year <span class="ot">&lt;-</span> <span class="fu">year</span>(crimeDataCleaned<span class="sc">$</span>DATE.OCC)</span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Display the structure of the cleaned data to verify</span></span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(crimeDataCleaned)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>'data.frame':   944235 obs. of  13 variables:
+ $ DATE.OCC    : POSIXct, format: "2020-03-01" "2020-02-08" ...
+ $ TIME.OCC    : int  2130 1800 1700 2037 1200 2300 900 1110 1400 1220 ...
+ $ AREA        : int  7 1 3 9 6 18 1 3 13 19 ...
+ $ AREA.NAME   : chr  "Wilshire" "Central" "Southwest" "Van Nuys" ...
+ $ Crm.Cd      : int  510 330 480 343 354 354 354 354 354 624 ...
+ $ Crm.Cd.Desc : chr  "VEHICLE - STOLEN" "BURGLARY FROM VEHICLE" "BIKE - STOLEN" "SHOPLIFTING-GRAND THEFT ($950.01 &amp; OVER)" ...
+ $ Vict.Age    : int  0 47 19 19 28 41 25 27 24 26 ...
+ $ Vict.Sex    : chr  "M" "M" "X" "M" ...
+ $ Vict.Descent: chr  "O" "O" "X" "O" ...
+ $ LAT         : num  34 34 34 34.2 34.1 ...
+ $ LON         : num  -118 -118 -118 -118 -118 ...
+ $ Month       : num  3 2 11 3 8 12 7 5 12 12 ...
+ $ Year        : num  2020 2020 2020 2020 2020 2020 2020 2020 2020 2020 ...</code></pre>
+</div>
+</div>
+<p>There are some rows in TIME.OCC that have values such as 1,2,3 etc. We will assume that these mean 0100, 0200, 0300. Also some values are 100, 200, 300. We will assume these values are 0100, 0200, 0300 in military time. We will hence add a new column hour, indicating the hour at which the crime occured.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Correct TIME.OCC values:</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="co"># If TIME.OCC is a single digit (1-9), prepend "0" and append "00" to make it "0100", "0200", etc.</span></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a><span class="co"># If TIME.OCC is 2 digits, append "00" to convert it to "HH00"</span></span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a><span class="co"># If TIME.OCC is already 4 digits, assume it is in the format "HHMM"</span></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>crimeDataCleaned<span class="sc">$</span>TIME.OCC <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(<span class="fu">nchar</span>(crimeDataCleaned<span class="sc">$</span>TIME.OCC) <span class="sc">==</span> <span class="dv">1</span>,</span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>                                    <span class="fu">sprintf</span>(<span class="st">"%02d00"</span>, <span class="fu">as.numeric</span>(crimeDataCleaned<span class="sc">$</span>TIME.OCC)),</span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>                                    <span class="fu">ifelse</span>(<span class="fu">nchar</span>(crimeDataCleaned<span class="sc">$</span>TIME.OCC) <span class="sc">==</span> <span class="dv">2</span>,</span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>                                           <span class="fu">sprintf</span>(<span class="st">"%02d00"</span>, <span class="fu">as.numeric</span>(crimeDataCleaned<span class="sc">$</span>TIME.OCC)),</span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a>                                           <span class="fu">sprintf</span>(<span class="st">"%04d"</span>, <span class="fu">as.numeric</span>(crimeDataCleaned<span class="sc">$</span>TIME.OCC))))</span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract the hour from TIME.OCC</span></span>
+<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a>crimeDataCleaned<span class="sc">$</span>hour <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">substr</span>(crimeDataCleaned<span class="sc">$</span>TIME.OCC, <span class="dv">1</span>, <span class="dv">2</span>))</span>
+<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Display the structure of the cleaned data to verify</span></span>
+<span id="cb29-15"><a href="#cb29-15" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(crimeDataCleaned)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>'data.frame':   944235 obs. of  14 variables:
+ $ DATE.OCC    : POSIXct, format: "2020-03-01" "2020-02-08" ...
+ $ TIME.OCC    : chr  "2130" "1800" "1700" "2037" ...
+ $ AREA        : int  7 1 3 9 6 18 1 3 13 19 ...
+ $ AREA.NAME   : chr  "Wilshire" "Central" "Southwest" "Van Nuys" ...
+ $ Crm.Cd      : int  510 330 480 343 354 354 354 354 354 624 ...
+ $ Crm.Cd.Desc : chr  "VEHICLE - STOLEN" "BURGLARY FROM VEHICLE" "BIKE - STOLEN" "SHOPLIFTING-GRAND THEFT ($950.01 &amp; OVER)" ...
+ $ Vict.Age    : int  0 47 19 19 28 41 25 27 24 26 ...
+ $ Vict.Sex    : chr  "M" "M" "X" "M" ...
+ $ Vict.Descent: chr  "O" "O" "X" "O" ...
+ $ LAT         : num  34 34 34 34.2 34.1 ...
+ $ LON         : num  -118 -118 -118 -118 -118 ...
+ $ Month       : num  3 2 11 3 8 12 7 5 12 12 ...
+ $ Year        : num  2020 2020 2020 2020 2020 2020 2020 2020 2020 2020 ...
+ $ hour        : num  21 18 17 20 12 23 9 11 14 12 ...</code></pre>
+</div>
+</div>
+<p>Genders in the reports are only mentioned as M for male, F from Female and X if unknown. For simplicity, let us assume all unknown genders as either male or female distributed equally.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define a function to randomly replace non 'M' or 'F' values with 'M' or 'F'</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>replace_invalid_gender <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>  <span class="co"># If the value is not 'M' or 'F', replace it with a random 'M' or 'F'</span></span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span>x <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"M"</span>, <span class="st">"F"</span>)) {</span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(<span class="fu">sample</span>(<span class="fu">c</span>(<span class="st">"M"</span>, <span class="st">"F"</span>), <span class="dv">1</span>))</span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(x)</span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Apply the function to the Vict.Sex column</span></span>
+<span id="cb31-12"><a href="#cb31-12" aria-hidden="true" tabindex="-1"></a>crimeDataCleaned<span class="sc">$</span>Vict.Sex <span class="ot">&lt;-</span> <span class="fu">sapply</span>(crimeDataCleaned<span class="sc">$</span>Vict.Sex, replace_invalid_gender)</span>
+<span id="cb31-13"><a href="#cb31-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-14"><a href="#cb31-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Check the unique values in the Vict.Sex column to confirm changes</span></span>
+<span id="cb31-15"><a href="#cb31-15" aria-hidden="true" tabindex="-1"></a><span class="fu">unique</span>(crimeDataCleaned<span class="sc">$</span>Vict.Sex)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "M" "F"</code></pre>
+</div>
+</div>
+<p>Victim.Age is a bit of a problem. A lot of them are 0. First lets see how many of them are 0.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Count the number of entries where Vict.Age is 0</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>num_age_zero <span class="ot">&lt;-</span> <span class="fu">sum</span>(crimeDataCleaned<span class="sc">$</span>Vict.Age <span class="sc">==</span> <span class="dv">0</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Display the result</span></span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>num_age_zero</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 240110</code></pre>
+</div>
+</div>
+<p>That is 1/4th of data that we have. Upon further exploration of the data, I have found out that in most cases where age is 0, it describes crimes that have not occurred against humans. We will see more about this later.</p>
+<p>Since the data for the year 2024 is complete, lets get rid of all records from the year 2024.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Filter out rows where Year is 2024</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>crimeDataCleaned <span class="ot">&lt;-</span> crimeDataCleaned <span class="sc">%&gt;%</span></span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Year <span class="sc">!=</span> <span class="dv">2024</span>)</span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Verify the removal</span></span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(crimeDataCleaned<span class="sc">$</span>Year)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+  2020   2021   2022   2023 
+199700 209703 234975 231642 </code></pre>
+</div>
+</div>
+<p>Now we can begin the EDA.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>age_zero_data <span class="ot">&lt;-</span> crimeDataCleaned <span class="sc">%&gt;%</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Vict.Age <span class="sc">==</span> <span class="dv">0</span>)</span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(age_zero_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>    DATE.OCC TIME.OCC AREA   AREA.NAME Crm.Cd
+1 2020-03-01     2130    7    Wilshire    510
+2 2020-11-01     0130   10 West Valley    510
+3 2020-09-09     0630    4  Hollenbeck    510
+4 2020-08-14     1300   21     Topanga    668
+5 2020-01-18     1600   14     Pacific    420
+6 2020-05-26     1200    2     Rampart    420
+                                      Crm.Cd.Desc Vict.Age Vict.Sex
+1                                VEHICLE - STOLEN        0        M
+2                                VEHICLE - STOLEN        0        M
+3                                VEHICLE - STOLEN        0        M
+4      EMBEZZLEMENT, GRAND THEFT ($950.01 &amp; OVER)        0        F
+5 THEFT FROM MOTOR VEHICLE - PETTY ($950 &amp; UNDER)        0        M
+6 THEFT FROM MOTOR VEHICLE - PETTY ($950 &amp; UNDER)        0        M
+  Vict.Descent     LAT       LON Month Year hour
+1            O 34.0375 -118.3506     3 2020   21
+2              34.1939 -118.4859    11 2020    1
+3              34.0820 -118.2130     9 2020    6
+4              34.2105 -118.6157     8 2020   13
+5              34.0022 -118.4255     1 2020   16
+6              34.0697 -118.2779     5 2020   12</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Count occurrences of each crime type and arrange them in descending order</span></span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>top_crimes <span class="ot">&lt;-</span> age_zero_data <span class="sc">%&gt;%</span></span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Crm.Cd.Desc) <span class="sc">%&gt;%</span></span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(n)) <span class="sc">%&gt;%</span></span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>(<span class="dv">10</span>)</span>
+<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Display the top 10 most common crime types</span></span>
+<span id="cb39-8"><a href="#cb39-8" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(top_crimes)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                                                Crm.Cd.Desc     n
+1                                          VEHICLE - STOLEN 93346
+2           THEFT FROM MOTOR VEHICLE - PETTY ($950 &amp; UNDER) 19043
+3                                                  BURGLARY 16690
+4                  SHOPLIFTING - PETTY THEFT ($950 &amp; UNDER) 14715
+5   VANDALISM - FELONY ($400 &amp; OVER, ALL CHURCH VANDALISMS) 13111
+6                                                   ROBBERY  5959
+7                        THEFT PLAIN - PETTY ($950 &amp; UNDER)  5828
+8  THEFT-GRAND ($950.01 &amp; OVER)EXCPT,GUNS,FOWL,LIVESTK,PROD  5762
+9                                               TRESPASSING  5290
+10                 VANDALISM - MISDEAMEANOR ($399 OR UNDER)  4752</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>total_crimes <span class="ot">&lt;-</span> <span class="fu">nrow</span>(age_zero_data)</span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate the total number of crimes in the top 10</span></span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>top_10_total <span class="ot">&lt;-</span> <span class="fu">sum</span>(top_crimes<span class="sc">$</span>n)</span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate the percentage</span></span>
+<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a>percentage_top_10 <span class="ot">&lt;-</span> (top_10_total <span class="sc">/</span> total_crimes) <span class="sc">*</span> <span class="dv">100</span></span>
+<span id="cb41-8"><a href="#cb41-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-9"><a href="#cb41-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Display the result</span></span>
+<span id="cb41-10"><a href="#cb41-10" aria-hidden="true" tabindex="-1"></a>percentage_top_10</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 84.51953</code></pre>
+</div>
+</div>
+<p>As we can see, the top 10 types of crime that have an age of 0 on reports account for about 85% of all crimes that have the age recorded as 0.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Filter the data where Vict.Age is not 0</span></span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>age_non_zero_data <span class="ot">&lt;-</span> crimeDataCleaned <span class="sc">%&gt;%</span></span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Vict.Age <span class="sc">!=</span> <span class="dv">0</span>)</span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Count occurrences of each crime type and arrange them in descending order</span></span>
+<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a>top_crimes <span class="ot">&lt;-</span> age_non_zero_data <span class="sc">%&gt;%</span></span>
+<span id="cb43-7"><a href="#cb43-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(<span class="st">`</span><span class="at">Crm.Cd.Desc</span><span class="st">`</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb43-8"><a href="#cb43-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">Count =</span> <span class="fu">n</span>()) <span class="sc">%&gt;%</span></span>
+<span id="cb43-9"><a href="#cb43-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(Count)) <span class="sc">%&gt;%</span></span>
+<span id="cb43-10"><a href="#cb43-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>(<span class="dv">10</span>)</span>
+<span id="cb43-11"><a href="#cb43-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-12"><a href="#cb43-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Display the top 10 most common crime types</span></span>
+<span id="cb43-13"><a href="#cb43-13" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(top_crimes)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 10 × 2
+   Crm.Cd.Desc                                             Count
+   &lt;chr&gt;                                                   &lt;int&gt;
+ 1 BATTERY - SIMPLE ASSAULT                                68554
+ 2 THEFT OF IDENTITY                                       54474
+ 3 BURGLARY FROM VEHICLE                                   52351
+ 4 ASSAULT WITH DEADLY WEAPON, AGGRAVATED ASSAULT          47971
+ 5 INTIMATE PARTNER - SIMPLE ASSAULT                       43265
+ 6 VANDALISM - FELONY ($400 &amp; OVER, ALL CHURCH VANDALISMS) 40018
+ 7 THEFT PLAIN - PETTY ($950 &amp; UNDER)                      39000
+ 8 BURGLARY                                                36714
+ 9 THEFT FROM MOTOR VEHICLE - GRAND ($950.01 AND OVER)     29690
+10 ROBBERY                                                 23853</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>total_crimes <span class="ot">&lt;-</span> <span class="fu">nrow</span>(age_non_zero_data)</span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate the total number of crimes in the top 10</span></span>
+<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a>top_10_total <span class="ot">&lt;-</span> <span class="fu">sum</span>(top_crimes<span class="sc">$</span>Count)</span>
+<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-6"><a href="#cb45-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate the percentage</span></span>
+<span id="cb45-7"><a href="#cb45-7" aria-hidden="true" tabindex="-1"></a>percentage_top_10 <span class="ot">&lt;-</span> (top_10_total <span class="sc">/</span> total_crimes) <span class="sc">*</span> <span class="dv">100</span></span>
+<span id="cb45-8"><a href="#cb45-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-9"><a href="#cb45-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Display the result</span></span>
+<span id="cb45-10"><a href="#cb45-10" aria-hidden="true" tabindex="-1"></a>percentage_top_10</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 66.27167</code></pre>
+</div>
+</div>
+<p>Here the top 10 types of crime account for more than 66% of all crimes that occur.</p>
+<p>Lets rename the columns to get a better picture</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>crimes_personalised <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Battery Assault"</span>, <span class="st">"Identity Theft"</span>, <span class="st">"Vehicle Burglary"</span>, <span class="st">"Agg Assault"</span>, <span class="st">"Assault by Partner"</span>, <span class="st">"Vandalism"</span>, <span class="st">"Petty Theft"</span>, <span class="st">"Burglary"</span>, <span class="st">"Theft from Vehicle"</span>, <span class="st">"Robbery"</span>)</span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>top_crimes<span class="sc">$</span>Crm.Cd.Desc <span class="ot">&lt;-</span> crimes_personalised</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Lets visualise these crimes.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plotting the histogram using ggplot2</span></span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(top_crimes, <span class="fu">aes</span>(<span class="at">x =</span><span class="fu">reorder</span>(Crm.Cd.Desc, <span class="sc">-</span>Count), <span class="at">y =</span> Count)) <span class="sc">+</span></span>
+<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">"identity"</span>, <span class="at">fill =</span> <span class="st">"steelblue"</span>) <span class="sc">+</span></span>
+<span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># coord_flip() +  # Flip coordinates to make the plot horizontal</span></span>
+<span id="cb48-5"><a href="#cb48-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Top 10 Types of Crimes in LA"</span>, <span class="at">x =</span> <span class="st">"Crime Type"</span>, <span class="at">y =</span> <span class="st">"Number of Occurrences"</span>) <span class="sc">+</span></span>
+<span id="cb48-6"><a href="#cb48-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>()<span class="sc">+</span></span>
+<span id="cb48-7"><a href="#cb48-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, <span class="at">hjust =</span> <span class="dv">1</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Crime-EDA_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Lets look at the distribution of age of the victims of all crimes.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a ggplot histogram</span></span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a>histogram_plot <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(age_non_zero_data, <span class="fu">aes</span>(<span class="at">x =</span> Vict.Age)) <span class="sc">+</span></span>
+<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">binwidth =</span> <span class="dv">5</span>, <span class="at">fill =</span> <span class="st">"skyblue"</span>, <span class="at">color =</span> <span class="st">"black"</span>, <span class="at">alpha =</span> <span class="fl">0.7</span>) <span class="sc">+</span></span>
+<span id="cb49-4"><a href="#cb49-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Histogram of Victim Ages (Non-Zero Ages)"</span>, <span class="at">x =</span> <span class="st">"Victim Age"</span>, <span class="at">y =</span> <span class="st">"Frequency"</span>) <span class="sc">+</span></span>
+<span id="cb49-5"><a href="#cb49-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span>
+<span id="cb49-6"><a href="#cb49-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-7"><a href="#cb49-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert the ggplot object to an interactive plotly plot</span></span>
+<span id="cb49-8"><a href="#cb49-8" aria-hidden="true" tabindex="-1"></a>interactive_histogram <span class="ot">&lt;-</span> <span class="fu">ggplotly</span>(histogram_plot)</span>
+<span id="cb49-9"><a href="#cb49-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-10"><a href="#cb49-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Display the interactive plot</span></span>
+<span id="cb49-11"><a href="#cb49-11" aria-hidden="true" tabindex="-1"></a>interactive_histogram</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="plotly html-widget html-fill-item" id="htmlwidget-82608be4c7ee7155db98" style="width:100%;height:464px;"></div>
+<script type="application/json" data-for="htmlwidget-82608be4c7ee7155db98">{"x":{"data":[{"orientation":"v","width":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"base":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"x":[-5,0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100,105,110,115,120],"y":[7,513,2540,4698,15730,53226,82604,95243,86552,69655,56369,50633,43010,35423,25966,15929,9705,5217,2647,1228,458,378,0,0,0,1],"text":["count:     7<br />Vict.Age:  -5","count:   513<br />Vict.Age:   0","count:  2540<br />Vict.Age:   5","count:  4698<br />Vict.Age:  10","count: 15730<br />Vict.Age:  15","count: 53226<br />Vict.Age:  20","count: 82604<br />Vict.Age:  25","count: 95243<br />Vict.Age:  30","count: 86552<br />Vict.Age:  35","count: 69655<br />Vict.Age:  40","count: 56369<br />Vict.Age:  45","count: 50633<br />Vict.Age:  50","count: 43010<br />Vict.Age:  55","count: 35423<br />Vict.Age:  60","count: 25966<br />Vict.Age:  65","count: 15929<br />Vict.Age:  70","count:  9705<br />Vict.Age:  75","count:  5217<br />Vict.Age:  80","count:  2647<br />Vict.Age:  85","count:  1228<br />Vict.Age:  90","count:   458<br />Vict.Age:  95","count:   378<br />Vict.Age: 100","count:     0<br />Vict.Age: 105","count:     0<br />Vict.Age: 110","count:     0<br />Vict.Age: 115","count:     1<br />Vict.Age: 120"],"type":"bar","textposition":"none","marker":{"autocolorscale":false,"color":"rgba(135,206,235,0.7)","line":{"width":1.8897637795275593,"color":"rgba(0,0,0,1)"}},"showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":43.762557077625573,"r":7.3059360730593621,"b":40.182648401826491,"l":60.639269406392714},"font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724},"title":{"text":"Histogram of Victim Ages (Non-Zero Ages)","font":{"color":"rgba(0,0,0,1)","family":"","size":17.534246575342465},"x":0,"xref":"paper"},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-14,129],"tickmode":"array","ticktext":["0","40","80","120"],"tickvals":[0,40,79.999999999999986,120],"categoryorder":"array","categoryarray":["0","40","80","120"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.6529680365296811,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"y","title":{"text":"Victim Age","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-4762.1500000000005,100005.14999999999],"tickmode":"array","ticktext":["0","25000","50000","75000","100000"],"tickvals":[0,25000.000000000004,50000,75000,100000],"categoryorder":"array","categoryarray":["0","25000","50000","75000","100000"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.6529680365296811,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"x","title":{"text":"Frequency","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":false,"legend":{"bgcolor":null,"bordercolor":null,"borderwidth":0,"font":{"color":"rgba(0,0,0,1)","family":"","size":11.68949771689498}},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"source":"A","attrs":{"314843445f0a":{"x":{},"type":"bar"}},"cur_data":"314843445f0a","visdat":{"314843445f0a":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+<p>Most victims are of the age group from 25-45.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Aggregate the data by Year and Month</span></span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a>crimes_by_month_year <span class="ot">&lt;-</span> crimeDataCleaned <span class="sc">%&gt;%</span></span>
+<span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Year, Month) <span class="sc">%&gt;%</span></span>
+<span id="cb50-4"><a href="#cb50-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">Count =</span> <span class="fu">n</span>()) <span class="sc">%&gt;%</span></span>
+<span id="cb50-5"><a href="#cb50-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(Year, Month)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>`summarise()` has grouped output by 'Year'. You can override using the
+`.groups` argument.</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create the line plot with different lines for each year</span></span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a>line_plot <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(crimes_by_month_year, <span class="fu">aes</span>(<span class="at">x =</span> Month, <span class="at">y =</span> Count, <span class="at">color =</span> <span class="fu">factor</span>(Year), <span class="at">group =</span> Year)) <span class="sc">+</span></span>
+<span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb52-4"><a href="#cb52-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">breaks =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">12</span>, <span class="at">labels =</span> month.name) <span class="sc">+</span>  <span class="co"># Label months by name</span></span>
+<span id="cb52-5"><a href="#cb52-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Total Number of Crimes by Month for Each Year"</span>, </span>
+<span id="cb52-6"><a href="#cb52-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Month"</span>, <span class="at">y =</span> <span class="st">"Number of Crimes"</span>, <span class="at">color =</span> <span class="st">"Year"</span>) <span class="sc">+</span></span>
+<span id="cb52-7"><a href="#cb52-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>()<span class="sc">+</span></span>
+<span id="cb52-8"><a href="#cb52-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, <span class="at">hjust =</span> <span class="dv">1</span>),<span class="at">panel.grid =</span> <span class="fu">element_blank</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
+ℹ Please use `linewidth` instead.</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert to an interactive plotly plot</span></span>
+<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a>interactive_line_plot <span class="ot">&lt;-</span> <span class="fu">ggplotly</span>(line_plot)</span>
+<span id="cb54-3"><a href="#cb54-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-4"><a href="#cb54-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Display the interactive plot</span></span>
+<span id="cb54-5"><a href="#cb54-5" aria-hidden="true" tabindex="-1"></a>interactive_line_plot</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="plotly html-widget html-fill-item" id="htmlwidget-870b52386b74e31099d2" style="width:100%;height:464px;"></div>
+<script type="application/json" data-for="htmlwidget-870b52386b74e31099d2">{"x":{"data":[{"x":[1,2,3,4,5,6,7,8,9,10,11,12],"y":[18542,17272,16183,15699,17219,17048,17141,16890,15647,16502,15587,15970],"text":["Month:  1<br />Count: 18542<br />factor(Year): 2020<br />Year: 2020","Month:  2<br />Count: 17272<br />factor(Year): 2020<br />Year: 2020","Month:  3<br />Count: 16183<br />factor(Year): 2020<br />Year: 2020","Month:  4<br />Count: 15699<br />factor(Year): 2020<br />Year: 2020","Month:  5<br />Count: 17219<br />factor(Year): 2020<br />Year: 2020","Month:  6<br />Count: 17048<br />factor(Year): 2020<br />Year: 2020","Month:  7<br />Count: 17141<br />factor(Year): 2020<br />Year: 2020","Month:  8<br />Count: 16890<br />factor(Year): 2020<br />Year: 2020","Month:  9<br />Count: 15647<br />factor(Year): 2020<br />Year: 2020","Month: 10<br />Count: 16502<br />factor(Year): 2020<br />Year: 2020","Month: 11<br />Count: 15587<br />factor(Year): 2020<br />Year: 2020","Month: 12<br />Count: 15970<br />factor(Year): 2020<br />Year: 2020"],"type":"scatter","mode":"lines","line":{"width":3.7795275590551185,"color":"rgba(248,118,109,1)","dash":"solid"},"hoveron":"points","name":"2020","legendgroup":"2020","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[1,2,3,4,5,6,7,8,9,10,11,12],"y":[16606,15427,16340,16074,17008,17174,18672,18387,18374,19326,18366,17949],"text":["Month:  1<br />Count: 16606<br />factor(Year): 2021<br />Year: 2021","Month:  2<br />Count: 15427<br />factor(Year): 2021<br />Year: 2021","Month:  3<br />Count: 16340<br />factor(Year): 2021<br />Year: 2021","Month:  4<br />Count: 16074<br />factor(Year): 2021<br />Year: 2021","Month:  5<br />Count: 17008<br />factor(Year): 2021<br />Year: 2021","Month:  6<br />Count: 17174<br />factor(Year): 2021<br />Year: 2021","Month:  7<br />Count: 18672<br />factor(Year): 2021<br />Year: 2021","Month:  8<br />Count: 18387<br />factor(Year): 2021<br />Year: 2021","Month:  9<br />Count: 18374<br />factor(Year): 2021<br />Year: 2021","Month: 10<br />Count: 19326<br />factor(Year): 2021<br />Year: 2021","Month: 11<br />Count: 18366<br />factor(Year): 2021<br />Year: 2021","Month: 12<br />Count: 17949<br />factor(Year): 2021<br />Year: 2021"],"type":"scatter","mode":"lines","line":{"width":3.7795275590551185,"color":"rgba(124,174,0,1)","dash":"solid"},"hoveron":"points","name":"2021","legendgroup":"2021","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[1,2,3,4,5,6,7,8,9,10,11,12],"y":[18515,17735,19722,19820,20450,20255,19985,20117,19321,20313,18734,20008],"text":["Month:  1<br />Count: 18515<br />factor(Year): 2022<br />Year: 2022","Month:  2<br />Count: 17735<br />factor(Year): 2022<br />Year: 2022","Month:  3<br />Count: 19722<br />factor(Year): 2022<br />Year: 2022","Month:  4<br />Count: 19820<br />factor(Year): 2022<br />Year: 2022","Month:  5<br />Count: 20450<br />factor(Year): 2022<br />Year: 2022","Month:  6<br />Count: 20255<br />factor(Year): 2022<br />Year: 2022","Month:  7<br />Count: 19985<br />factor(Year): 2022<br />Year: 2022","Month:  8<br />Count: 20117<br />factor(Year): 2022<br />Year: 2022","Month:  9<br />Count: 19321<br />factor(Year): 2022<br />Year: 2022","Month: 10<br />Count: 20313<br />factor(Year): 2022<br />Year: 2022","Month: 11<br />Count: 18734<br />factor(Year): 2022<br />Year: 2022","Month: 12<br />Count: 20008<br />factor(Year): 2022<br />Year: 2022"],"type":"scatter","mode":"lines","line":{"width":3.7795275590551185,"color":"rgba(0,191,196,1)","dash":"solid"},"hoveron":"points","name":"2022","legendgroup":"2022","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[1,2,3,4,5,6,7,8,9,10,11,12],"y":[19902,18465,19167,18900,18873,18689,19894,20024,19262,20029,19006,19431],"text":["Month:  1<br />Count: 19902<br />factor(Year): 2023<br />Year: 2023","Month:  2<br />Count: 18465<br />factor(Year): 2023<br />Year: 2023","Month:  3<br />Count: 19167<br />factor(Year): 2023<br />Year: 2023","Month:  4<br />Count: 18900<br />factor(Year): 2023<br />Year: 2023","Month:  5<br />Count: 18873<br />factor(Year): 2023<br />Year: 2023","Month:  6<br />Count: 18689<br />factor(Year): 2023<br />Year: 2023","Month:  7<br />Count: 19894<br />factor(Year): 2023<br />Year: 2023","Month:  8<br />Count: 20024<br />factor(Year): 2023<br />Year: 2023","Month:  9<br />Count: 19262<br />factor(Year): 2023<br />Year: 2023","Month: 10<br />Count: 20029<br />factor(Year): 2023<br />Year: 2023","Month: 11<br />Count: 19006<br />factor(Year): 2023<br />Year: 2023","Month: 12<br />Count: 19431<br />factor(Year): 2023<br />Year: 2023"],"type":"scatter","mode":"lines","line":{"width":3.7795275590551185,"color":"rgba(199,124,255,1)","dash":"solid"},"hoveron":"points","name":"2023","legendgroup":"2023","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":43.762557077625573,"r":7.3059360730593621,"b":56.800610368868405,"l":54.794520547945211},"plot_bgcolor":"rgba(255,255,255,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724},"title":{"text":"Total Number of Crimes by Month for Each Year","font":{"color":"rgba(0,0,0,1)","family":"","size":17.534246575342465},"x":0,"xref":"paper"},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[0.44999999999999996,12.550000000000001],"tickmode":"array","ticktext":["January","February","March","April","May","June","July","August","September","October","November","December"],"tickvals":[1,2,3,4,5,6,7.0000000000000009,8,9,10,11,12],"categoryorder":"array","categoryarray":["January","February","March","April","May","June","July","August","September","October","November","December"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.6529680365296811,"tickwidth":0.66417600664176002,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-45,"showline":true,"linecolor":"rgba(0,0,0,1)","linewidth":0.66417600664176002,"showgrid":false,"gridcolor":null,"gridwidth":0,"zeroline":false,"anchor":"y","title":{"text":"Month","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[15175.85,20701.150000000001],"tickmode":"array","ticktext":["16000","17000","18000","19000","20000"],"tickvals":[16000,17000,18000,19000,20000],"categoryorder":"array","categoryarray":["16000","17000","18000","19000","20000"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.6529680365296811,"tickwidth":0.66417600664176002,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":true,"linecolor":"rgba(0,0,0,1)","linewidth":0.66417600664176002,"showgrid":false,"gridcolor":null,"gridwidth":0,"zeroline":false,"anchor":"x","title":{"text":"Number of Crimes","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":true,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":1.8897637795275593,"font":{"color":"rgba(0,0,0,1)","family":"","size":11.68949771689498},"title":{"text":"Year","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}}},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"source":"A","attrs":{"314817753a4f":{"x":{},"y":{},"colour":{},"type":"scatter"}},"cur_data":"314817753a4f","visdat":{"314817753a4f":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

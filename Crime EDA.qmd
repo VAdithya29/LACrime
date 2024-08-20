@@ -1,0 +1,257 @@
+---
+title: "Crime EDA"
+author: "Adithya Venghatesan"
+format: html
+---
+
+Dataset: https://www.kaggle.com/datasets/asaniczka/crimes-in-los-angeles-2020-2023
+
+## Load required Libraries
+```{r Warnings=FALSE}
+library(dplyr)
+library(ggplot2)
+library(lubridate)
+library(caret)
+library(leaflet)
+library(plotly)
+```
+
+## Load the dataset
+
+```{r}
+crimeDatacsv <- read.csv("LA Crime Data.csv")
+```
+
+
+```{r}
+summary(crimeDatacsv)
+```
+
+```{r}
+unique(crimeDatacsv$Crm.Cd.Desc)
+```
+There have been 139 unique types of crime in Los Angeles.
+
+Lets look at the distribution of the top 10 types of crimes.
+
+```{r}
+
+```
+
+
+Dropping columns that are not required for EDA is the first order of business. 
+The columns that will be dropped are:  DR_NO, Date.Rptd, Rpt.Dist.No, Part.1.2, Mocodes, Status, Status.Desc, Crm.Cd.1, Crm.Cd.2, Crm.Cd.3, Crm.Cd.4, LOCATION, Cross.Street, Weapon.Desc, Weapon.Used.Cd.
+We will make the necessary changes and store them in a new dataframe called crimeDataCleaned.
+
+```{r}
+# Store the columns to be removed in a variable
+colsToRemove <- c("DR_NO", "Date.Rptd", "Rpt.Dist.No", 
+                  "Part.1.2", "Mocodes", "Status", 
+                  "Status.Desc", "Crm.Cd.1", "Crm.Cd.2", 
+                  "Crm.Cd.3", "Crm.Cd.4", "LOCATION","Premis.Cd","Premis.Desc", 
+                  "Cross.Street","Weapon.Desc","Weapon.Used.Cd")
+
+# Drop the specified columns and store the result in a new dataframe
+crimeDataCleaned <- crimeDatacsv[, !names(crimeDatacsv) %in% colsToRemove]
+
+# Display the structure of the cleaned data to verify
+str(crimeDataCleaned)
+```
+
+DATE.OCC is in dd/mm/yyyy hh:mm:ss AM/PM format. All the times are 12:00:00 since there is a separate TIME.OCC Column. We can get rid of the Time in this column and use lubritdate to extract the month and year and store them in separate columns.
+
+```{r}
+# Convert DATE.OCC to a proper datetime format using lubridate
+crimeDataCleaned$DATE.OCC <- mdy_hms(crimeDataCleaned$DATE.OCC)
+
+# Extract the month and year from DATE.OCC and store them in new columns
+crimeDataCleaned$Month <- month(crimeDataCleaned$DATE.OCC)
+crimeDataCleaned$Year <- year(crimeDataCleaned$DATE.OCC)
+
+# Display the structure of the cleaned data to verify
+str(crimeDataCleaned)
+```
+
+There are some rows in TIME.OCC that have values such as 1,2,3 etc. We will assume that these mean 0100, 0200, 0300.
+Also some values are 100, 200, 300. We will assume these values are 0100, 0200, 0300 in military time.
+We will hence add a new column hour, indicating the hour at which the crime occured.
+
+```{r}
+# Correct TIME.OCC values:
+# If TIME.OCC is a single digit (1-9), prepend "0" and append "00" to make it "0100", "0200", etc.
+# If TIME.OCC is 2 digits, append "00" to convert it to "HH00"
+# If TIME.OCC is already 4 digits, assume it is in the format "HHMM"
+crimeDataCleaned$TIME.OCC <- ifelse(nchar(crimeDataCleaned$TIME.OCC) == 1,
+                                    sprintf("%02d00", as.numeric(crimeDataCleaned$TIME.OCC)),
+                                    ifelse(nchar(crimeDataCleaned$TIME.OCC) == 2,
+                                           sprintf("%02d00", as.numeric(crimeDataCleaned$TIME.OCC)),
+                                           sprintf("%04d", as.numeric(crimeDataCleaned$TIME.OCC))))
+
+# Extract the hour from TIME.OCC
+crimeDataCleaned$hour <- as.numeric(substr(crimeDataCleaned$TIME.OCC, 1, 2))
+
+# Display the structure of the cleaned data to verify
+str(crimeDataCleaned)
+```
+
+Genders in the reports are only mentioned as M for male, F from Female and X if unknown. For simplicity, let us assume all unknown genders as either male or female distributed equally.
+
+```{r}
+# Define a function to randomly replace non 'M' or 'F' values with 'M' or 'F'
+replace_invalid_gender <- function(x) {
+  # If the value is not 'M' or 'F', replace it with a random 'M' or 'F'
+  if (!x %in% c("M", "F")) {
+    return(sample(c("M", "F"), 1))
+  } else {
+    return(x)
+  }
+}
+
+# Apply the function to the Vict.Sex column
+crimeDataCleaned$Vict.Sex <- sapply(crimeDataCleaned$Vict.Sex, replace_invalid_gender)
+
+# Check the unique values in the Vict.Sex column to confirm changes
+unique(crimeDataCleaned$Vict.Sex)
+```
+
+Victim.Age is a bit of a problem. A lot of them are 0.
+First lets see how many of them are 0.
+
+```{r}
+# Count the number of entries where Vict.Age is 0
+num_age_zero <- sum(crimeDataCleaned$Vict.Age == 0, na.rm = TRUE)
+
+# Display the result
+num_age_zero
+```
+That is 1/4th of data that we have. 
+Upon further exploration of the data, I have found out that in most cases where age is 0, it describes crimes that have not occurred against humans. We will see more about this later.
+
+Since the data for the year 2024 is complete, lets get rid of all records from the year 2024.
+
+```{r}
+# Filter out rows where Year is 2024
+crimeDataCleaned <- crimeDataCleaned %>%
+  filter(Year != 2024)
+
+# Verify the removal
+table(crimeDataCleaned$Year)
+```
+
+Now we can begin the EDA.
+
+```{r}
+age_zero_data <- crimeDataCleaned %>%
+  filter(Vict.Age == 0)
+
+head(age_zero_data)
+```
+
+```{r}
+# Count occurrences of each crime type and arrange them in descending order
+top_crimes <- age_zero_data %>%
+  count(Crm.Cd.Desc) %>%
+  arrange(desc(n)) %>%
+  head(10)
+
+# Display the top 10 most common crime types
+print(top_crimes)
+
+total_crimes <- nrow(age_zero_data)
+
+# Calculate the total number of crimes in the top 10
+top_10_total <- sum(top_crimes$n)
+
+# Calculate the percentage
+percentage_top_10 <- (top_10_total / total_crimes) * 100
+
+# Display the result
+percentage_top_10
+```
+As we can see, the top 10 types of crime that have an age of 0 on reports account for about 85% of all crimes that have the age recorded as 0.
+
+```{r}
+# Filter the data where Vict.Age is not 0
+age_non_zero_data <- crimeDataCleaned %>%
+  filter(Vict.Age != 0)
+
+# Count occurrences of each crime type and arrange them in descending order
+top_crimes <- age_non_zero_data %>%
+  group_by(`Crm.Cd.Desc`) %>%
+  summarise(Count = n()) %>%
+  arrange(desc(Count)) %>%
+  head(10)
+
+# Display the top 10 most common crime types
+print(top_crimes)
+
+total_crimes <- nrow(age_non_zero_data)
+
+# Calculate the total number of crimes in the top 10
+top_10_total <- sum(top_crimes$Count)
+
+# Calculate the percentage
+percentage_top_10 <- (top_10_total / total_crimes) * 100
+
+# Display the result
+percentage_top_10
+```
+Here the top 10 types of crime account for more than 66% of all crimes that occur.
+
+Lets rename the columns to get a better picture
+```{r}
+crimes_personalised <- c("Battery Assault", "Identity Theft", "Vehicle Burglary", "Agg Assault", "Assault by Partner", "Vandalism", "Petty Theft", "Burglary", "Theft from Vehicle", "Robbery")
+top_crimes$Crm.Cd.Desc <- crimes_personalised
+```
+
+Lets visualise these crimes.
+
+```{r}
+# Plotting the histogram using ggplot2
+ggplot(top_crimes, aes(x =reorder(Crm.Cd.Desc, -Count), y = Count)) +
+  geom_bar(stat = "identity", fill = "steelblue") +
+  # coord_flip() +  # Flip coordinates to make the plot horizontal
+  labs(title = "Top 10 Types of Crimes in LA", x = "Crime Type", y = "Number of Occurrences") +
+  theme_classic()+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+
+Lets look at the distribution of age of the victims of all crimes.
+```{r}
+# Create a ggplot histogram
+histogram_plot <- ggplot(age_non_zero_data, aes(x = Vict.Age)) +
+  geom_histogram(binwidth = 5, fill = "skyblue", color = "black", alpha = 0.7) +
+  labs(title = "Histogram of Victim Ages (Non-Zero Ages)", x = "Victim Age", y = "Frequency") +
+  theme_minimal()
+
+# Convert the ggplot object to an interactive plotly plot
+interactive_histogram <- ggplotly(histogram_plot)
+
+# Display the interactive plot
+interactive_histogram
+```
+Most victims are of the age group from 25-45.
+
+```{r}
+# Aggregate the data by Year and Month
+crimes_by_month_year <- crimeDataCleaned %>%
+  group_by(Year, Month) %>%
+  summarise(Count = n()) %>%
+  arrange(Year, Month)
+
+# Create the line plot with different lines for each year
+line_plot <- ggplot(crimes_by_month_year, aes(x = Month, y = Count, color = factor(Year), group = Year)) +
+  geom_line(size = 1) +
+  scale_x_continuous(breaks = 1:12, labels = month.name) +  # Label months by name
+  labs(title = "Total Number of Crimes by Month for Each Year", 
+       x = "Month", y = "Number of Crimes", color = "Year") +
+  theme_classic()+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),panel.grid = element_blank())
+
+# Convert to an interactive plotly plot
+interactive_line_plot <- ggplotly(line_plot)
+
+# Display the interactive plot
+interactive_line_plot
+```
