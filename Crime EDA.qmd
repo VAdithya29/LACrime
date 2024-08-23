@@ -2,6 +2,9 @@
 title: "Crime EDA"
 author: "Adithya Venghatesan"
 format: html
+execute: 
+  warning: false
+  error: true
 ---
 
 Dataset: https://www.kaggle.com/datasets/asaniczka/crimes-in-los-angeles-2020-2023
@@ -35,12 +38,37 @@ There have been 139 unique types of crime in Los Angeles.
 Lets look at the distribution of the top 10 types of crimes.
 
 ```{r}
-
+top_crimes <- crimeDatacsv %>%
+  count(Crm.Cd.Desc) %>%
+  arrange(desc(n)) %>%
+  head(10)
 ```
 
+```{r}
+top_crimes
+```
+Vehicle Theft is the most common type of crime.
 
-Dropping columns that are not required for EDA is the first order of business. 
+```{r}
+crime_by_area <- crimeDatacsv %>%
+  group_by(`AREA.NAME`) %>%
+  summarise(Count = n()) %>%
+  arrange(desc(Count)) 
+
+# Plotting the histogram using ggplot2
+ggplot(crime_by_area, aes(x =reorder(AREA.NAME, -Count), y = Count)) +
+  geom_bar(stat = "identity", fill = "steelblue") +
+  # coord_flip() +  # Flip coordinates to make the plot horizontal
+  labs(title = "Most Unsafe Places in LA", x = "Area Name", y = "Number of Occurrences") +
+  theme_classic()+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+The areas Central, 77th Street and Pacific are the most crime prone area. Most concerning is the face that even the "safest" place in LA city hass experiences almost 400,000 crimes over these 4 years.
+
+Dropping columns that are not required for EDA is the next order of business. 
 The columns that will be dropped are:  DR_NO, Date.Rptd, Rpt.Dist.No, Part.1.2, Mocodes, Status, Status.Desc, Crm.Cd.1, Crm.Cd.2, Crm.Cd.3, Crm.Cd.4, LOCATION, Cross.Street, Weapon.Desc, Weapon.Used.Cd.
+
 We will make the necessary changes and store them in a new dataframe called crimeDataCleaned.
 
 ```{r}
@@ -58,7 +86,7 @@ crimeDataCleaned <- crimeDatacsv[, !names(crimeDatacsv) %in% colsToRemove]
 str(crimeDataCleaned)
 ```
 
-DATE.OCC is in dd/mm/yyyy hh:mm:ss AM/PM format. All the times are 12:00:00 since there is a separate TIME.OCC Column. We can get rid of the Time in this column and use lubritdate to extract the month and year and store them in separate columns.
+DATE.OCC is in dd/mm/yyyy hh:mm:ss AM/PM format. All the times are 12:00:00 since there is a separate TIME.OCC Column. We can get rid of the Time in this column and use lubricate to extract the month and year and store them in separate columns.
 
 ```{r}
 # Convert DATE.OCC to a proper datetime format using lubridate
@@ -216,8 +244,8 @@ ggplot(top_crimes, aes(x =reorder(Crm.Cd.Desc, -Count), y = Count)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
-
 Lets look at the distribution of age of the victims of all crimes.
+
 ```{r}
 # Create a ggplot histogram
 histogram_plot <- ggplot(age_non_zero_data, aes(x = Vict.Age)) +
@@ -231,6 +259,7 @@ interactive_histogram <- ggplotly(histogram_plot)
 # Display the interactive plot
 interactive_histogram
 ```
+
 Most victims are of the age group from 25-45.
 
 ```{r}
